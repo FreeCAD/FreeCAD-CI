@@ -1,0 +1,17 @@
+# file types to ignore
+
+*.DS_Store
+*.pyc
+*.obj
+*.lib
+*.pch
+*.vcproj
+*.exp
+*.dep
+*.manifest
+*.o
+*.orig
+*~
+
+.tags
+tags
