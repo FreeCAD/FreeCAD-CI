@@ -1,3 +1,5 @@
++ based on README from Przemo, patched by Bernd
+
 It's BETA stage - limited knowledge is required or can be obtained on the FreeCAD forum.
 
 The is the test bed to replace travis-CI that no longer is sufficient
