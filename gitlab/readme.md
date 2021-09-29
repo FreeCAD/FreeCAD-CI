@@ -11,9 +11,7 @@
 
 ### gitlab CI for a github project
 + https://docs.gitlab.com/ee/user/project/integrations/github.html
-+ https://about.gitlab.com/solutions/github/
-+ scroll down to Benefits, see picture, it is like it was with travis
-+ GitHub project service integration webhooks CI status back to GitHub.
++ https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/#pipelines-for-external-pull-requests
 
 ### On github
 + status checks befor merging a PR in github for FreeCAD master branch:
