@@ -1,0 +1,4 @@
+docker images && docker volume ls && docker container ls
+
+# DANGER ZONE - DO NOT UNCOMMENT UNLESS YOU KNOW WHAT YOU'RE DOING!
+# docker system prune -a

@@ -1,0 +1,17 @@
+# The very first run will build the image and register it with github. Use your own registration-token or you'll register runner with my repo.
+
+if [ -n "$1" ]; then
+	docker run --rm -v gitlab-runner-config:/etc/gitlab-runner gitlab/gitlab-runner register \
+		 --non-interactive \
+		 --executor "docker" \
+		 --docker-image gitlab/gitlab-runner \
+		 --url "https://gitlab.com/" \
+		 --registration-token "$1" \
+		 --description "local-docker-runner" \
+		 --tag-list "" \
+		 --run-untagged="true" \
+		 --locked="true" \
+		 --access-level="not_protected"
+else
+	echo "Please provide gitlab CI registration token in the command line! Aborting!" && exit 1
+fi
