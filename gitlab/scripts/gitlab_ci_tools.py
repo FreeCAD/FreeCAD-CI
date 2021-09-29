@@ -95,19 +95,7 @@ def get_gitlab_prs_pipelinedata(token, projectname_on_gitlab):
 
 
 # ************************************************************************************************
-base_comment_pr_pipeline = """FreeCAD CI-repository:
-branch:
-https://gitlab.com/berndhahnebach/FreeCAD/-/commits/branchname
-
-pipeline for commit commitid:
-https://gitlab.com/berndhahnebach/FreeCAD/-/pipelines/pipelineid
-
-status:
-statusvalue
-
-all pipelines for each branch: 
-https://gitlab.com/berndhahnebach/FreeCAD/-/pipelines?scope=branches
-"""
+base_comment_pr_pipeline = """<a href="https://gitlab.com/berndhahnebach/FreeCAD/-/commits/branchname"><img alt="pipeline status" src="https://gitlab.com/berndhahnebach/FreeCAD/badges/branchname/pipeline.svg" /></a> for feature branch [branchname](https://gitlab.com/berndhahnebach/FreeCAD/-/commits/branchname). Pipeline [#pipelineid ](https://gitlab.com/berndhahnebach/FreeCAD/-/pipelines/pipelineid) was triggered at [shortidcommit](https://github.com/FreeCAD/FreeCAD/pull/pullid/commits/commitid). All CI branch [pipelines](https://gitlab.com/berndhahnebach/FreeCAD/-/pipelines?scope=branches)."""
 
 
 def generate_comment_foreach_pr_pipeline(token, prs_pipelinedata):
@@ -125,14 +113,17 @@ def generate_comment_foreach_pr_pipeline(token, prs_pipelinedata):
         if pr.number in prs_pipelinedata:
             branchname = prs_pipelinedata[pr.number][0]
             pipelineid = str(prs_pipelinedata[pr.number][1])
-            statusvalue = prs_pipelinedata[pr.number][2]
+            # statusvalue = prs_pipelinedata[pr.number][2]
             commitid = prs_pipelinedata[pr.number][3]
-            make_pipeline_comment = False
+            pullid = str(pr.number)
+            shortidcommit = prs_pipelinedata[pr.number][3][0:7]  # commitid should not in here
 
             the_comment = base_comment_pr_pipeline.replace("branchname", branchname)
             the_comment = the_comment.replace("pipelineid", pipelineid)
-            the_comment = the_comment.replace("statusvalue", statusvalue)
-            the_comment = the_comment.replace("commitid", commitid[0:14])
+            # the_comment = the_comment.replace("statusvalue", statusvalue)
+            the_comment = the_comment.replace("commitid", commitid)
+            the_comment = the_comment.replace("pullid", pullid)
+            the_comment = the_comment.replace("shortidcommit", shortidcommit)
             comments_all.append(the_comment)
             # print(the_comment)
             # print("\n\n")
