@@ -18,3 +18,7 @@
 + status checks befor merging a PR in github for FreeCAD master branch:
     + https://github.com/FreeCAD/FreeCAD/settings/branch_protection_rules/168514
 + https://docs.github.com/en/rest/reference/repos#statuses
+
+### Docker
++ What is the difference of a container compared to a virtual machine?
++ https://www.freecodecamp.org/news/a-beginner-friendly-introduction-to-containers-vms-and-docker-79a9e3e119b/
