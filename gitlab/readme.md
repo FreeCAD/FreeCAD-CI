@@ -9,7 +9,8 @@
 ### General information
 + https://about.gitlab.com/blog/2021/02/05/ci-deployment-and-environments/
 
-### Some more information about gitlab CI for a github project
+### gitlab CI for a github project
++ https://docs.gitlab.com/ee/user/project/integrations/github.html
 + https://about.gitlab.com/solutions/github/
 + scroll down to Benefits, see picture, it is like it was with travis
 + GitHub project service integration webhooks CI status back to GitHub.
