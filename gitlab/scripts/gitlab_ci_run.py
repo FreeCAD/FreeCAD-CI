@@ -27,7 +27,7 @@ prs_users_data = glci.get_github_open_pr_users_data(
     github_token
 )    
 status = glci.create_local_remote_foreach_pr_user(
-    repopath,
+    local_freecadci_repopath,
     prs_users_data
 )
 
