@@ -22,6 +22,14 @@ status = glci.create_local_branch_foreach_pr(
     local_freecadci_repopath,
     ids_prs
 )
+# get github pr users data, create a remote if not exists and fetch remote
+prs_users_data = glci.get_github_open_pr_users_data(
+    github_token
+)    
+status = glci.create_local_remote_foreach_pr_user(
+    repopath,
+    prs_users_data
+)
 
 
 # push

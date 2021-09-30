@@ -9,14 +9,41 @@ def get_github_open_pr_numbers(token=None):
     g = Github(token)
     repo = g.get_user("FreeCAD").get_repo("FreeCAD")
     repo.name
-    prs=repo.get_pulls("open")
+    prs_open = repo.get_pulls("open")
     ids_prs = []
-    for pr in prs:
+    for pr in prs_open:
         # print(pr.number)
         ids_prs.append(pr.number)
 
     print(len(ids_prs))
     return ids_prs
+
+
+# ************************************************************************************************
+def get_github_open_pr_users_data(token=None):
+    
+    if token is None:
+        print("No token given, nothing done.")
+        return
+
+    from github import Github
+    g = Github(token)
+    repo = g.get_user("FreeCAD").get_repo("FreeCAD")
+    repo.name
+    prs_open = repo.get_pulls("open")
+
+    prs_users_data = {}
+    for pr in prs_open:
+        if pr.user.login not in prs_users_data:
+            prs_users_data[pr.user.login] = pr.head.repo.html_url
+        else:
+            if prs_users_data[pr.user.login] != pr.head.repo.html_url:
+                print("Error, user uses different repos for his PRs.")
+
+    for k, v in prs_users_data.items():
+        print("{} --> {}".format(k, v))
+
+    return prs_users_data
 
 
 # ************************************************************************************************
@@ -50,6 +77,31 @@ def create_local_branch_foreach_pr(repopath, ids_prs):
             repo.git.fetch("freecad", fetch_string)
         except:
             print("Failed: {}".format(pr_no))
+
+    return True
+
+
+# ************************************************************************************************
+def create_local_remote_foreach_pr_user(repopath, prs_users_data):
+
+    # local repo, create non existing remotes, fetch all remotes
+    from git import Repo
+    local_repo = Repo(repopath)
+
+    remote_names = []
+    for remote in local_repo.remotes:
+        remote_names.append(remote.name)
+
+    remote_names
+
+    for userlogin, repoaddress in prs_users_data.items():
+        if userlogin not in remote_names:
+            aremote = local_repo.create_remote(userlogin, repoaddress)
+        local_repo.git.fetch(userlogin)
+
+    for r in local_repo.remotes:
+        if r.name not in prs_users_data:
+            print(r)
 
     return True
 
