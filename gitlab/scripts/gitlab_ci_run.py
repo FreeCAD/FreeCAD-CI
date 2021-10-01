@@ -1,14 +1,19 @@
-# personal data
-from personal_data import github_token
-from personal_data import gitlab_token
-from personal_data import local_freecadci_repopath
-from personal_data import gitlab_freecadci_project
-
-
 # imports
 import gitlab_ci_tools as glci
 import importlib
 importlib.reload(glci)
+
+
+# repo data
+from personal_data import github_token
+from personal_data import gitlab_token
+from personal_data import local_freecadci_repopath
+from personal_data import gitlab_freecadci_project
+from personal_data import github_user
+from personal_data import github_prjname
+github_repo = glci.get_github_repo(github_token, github_user, github_prjname)
+gitlab_project = glci.get_gitlab_project(gitlab_token, gitlab_freecadci_project)
+local_ci_repo = glci.get_local_ci_repo(local_freecadci_repopath)
 
 
 # ************************************************************************************************
@@ -16,18 +21,18 @@ importlib.reload(glci)
 # ************************************************************************************************
 # get open PRs and create a local branch for each PR, delete all local PR branches before
 ids_prs = glci.get_github_open_pr_numbers(
-    github_token
+    github_repo
 )
 status = glci.create_local_branch_foreach_pr(
-    local_freecadci_repopath,
+    local_ci_repo,
     ids_prs
 )
 # get github pr users data, create a remote if not exists and fetch remote
 prs_users_data = glci.get_github_open_pr_users_data(
-    github_token
+    github_repo
 )    
 status = glci.create_local_remote_foreach_pr_user(
-    local_freecadci_repopath,
+    local_ci_repo,
     prs_users_data
 )
 
@@ -36,7 +41,7 @@ status = glci.create_local_remote_foreach_pr_user(
 # if pushed from bash some information it printed about what was updated
 # TODO should be possible with gitpython too
 # TODO how to push without putting in login or password
-# glci.push_to_local_repo(local_freecadci_repopath)
+# glci.push_to_local_ci_repo(local_ci_repo)
 # git push -f origin --all
 
 
@@ -44,11 +49,11 @@ status = glci.create_local_remote_foreach_pr_user(
 # get pipelinedata for the prs
 # generate comment if a pipline of any updated or added PR has finished
 prs_pipelinedata = glci.get_gitlab_prs_pipelinedata(
-    gitlab_token,
+    gitlab_project,
     gitlab_freecadci_project
 )
 comments_all, comments_new = glci.generate_comment_foreach_pr_pipeline(
-    github_token,
+    github_repo,
     prs_pipelinedata
 )
 #for c in comments_all:
@@ -61,7 +66,7 @@ for k, v in comments_new.items():
 
 
 # create commit on github, do comment if not in use
-# glci.create_on_github_comment_foreach_pr_pipeline(github_token, comments_new)
+# glci.create_on_github_comment_foreach_pr_pipeline(github_repo, comments_new)
 
 
 # ************************************************************************************************
@@ -69,7 +74,7 @@ for k, v in comments_new.items():
 # ************************************************************************************************
 # find which PRs does not have a special comment, just search for text ...
 pr_notextincomments = glci.get_github_prs_do_not_contain_text_in_all_comments(
-    github_token,
+    github_repo,
     "The CI-status is available on the latest commit of the branch."
 )
 pr_notextincomments
@@ -79,17 +84,17 @@ pr_notextincomments
 # get the branches without pipeline and check if the have the CI unit test commit
 # gitlab get branches without a pipeline
 brs_no_pipeline = glci.get_gitlab_branches_without_pipline(
-    gitlab_token,
+    gitlab_project,
     gitlab_freecadci_project    
 )
 # github ...
 prs_base = glci.get_github_head_for_pr_branches(
-    github_token,
+    github_repo,
     brs_no_pipeline
 )
 # local ...
 cicommit_notok, cicommit_ok = glci.has_local_prbranch_a_specific_commit(
-    local_freecadci_repopath,
+    local_ci_repo,
     prs_base,
     "70c5505a75ad545cb671eb73f29d5e1626aebf78"
 )
@@ -115,9 +120,6 @@ curl -X POST \
 
 # nice output of branches to rebase
 result = glci.print_prlinks_according_user_and_pr(
-    github_token,
+    github_repo,
     cicommit_notok
 )
-
-
-# ************************************************************************************************

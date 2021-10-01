@@ -1,15 +1,37 @@
 # ************************************************************************************************
-def get_github_open_pr_numbers(token=None):
-
-    if token is None:
-        print("No token given, nothing done.")
-        return
+def get_github_repo(token, github_user, github_prjname):
 
     from github import Github
-    g = Github(token)
-    repo = g.get_user("FreeCAD").get_repo("FreeCAD")
-    repo.name
-    prs_open = repo.get_pulls("open")
+    gh = Github(token)
+    repo = gh.get_user(github_user).get_repo(github_prjname)
+    # print(repo.name)
+    return repo
+
+
+# ************************************************************************************************
+def get_gitlab_project(token, prj_namespace):
+
+    from gitlab import Gitlab
+    gl = Gitlab("https://gitlab.com/", private_token=token)
+    project = gl.projects.get(prj_namespace)
+    # print(project.name)
+    return project
+
+
+# ************************************************************************************************
+def get_local_ci_repo(repopath):
+    
+    from git import Repo
+    repo = Repo(repopath)
+
+    return repo
+
+
+# ************************************************************************************************
+def get_github_open_pr_numbers(github_repo):
+
+    prs_open = github_repo.get_pulls("open")
+
     ids_prs = []
     for pr in prs_open:
         # print(pr.number)
@@ -20,17 +42,9 @@ def get_github_open_pr_numbers(token=None):
 
 
 # ************************************************************************************************
-def get_github_open_pr_users_data(token=None):
+def get_github_open_pr_users_data(github_repo):
     
-    if token is None:
-        print("No token given, nothing done.")
-        return
-
-    from github import Github
-    g = Github(token)
-    repo = g.get_user("FreeCAD").get_repo("FreeCAD")
-    repo.name
-    prs_open = repo.get_pulls("open")
+    prs_open = github_repo.get_pulls("open")
 
     prs_users_data = {}
     for pr in prs_open:
@@ -47,21 +61,8 @@ def get_github_open_pr_users_data(token=None):
 
 
 # ************************************************************************************************
-def create_local_branch_foreach_pr(repopath, ids_prs):
+def create_local_branch_foreach_pr(repo, ids_prs):
 
-    # the main FreeCAD repo must been set up
-    # as remote "freecad"
-    
-    # TODO: even better error handling
-    if repopath is None:
-        print("No repopath given, nothing done.")
-        return
-    if ids_prs is None:
-        print("No pr-ids given, nothing done.")
-        return
-
-    from git import Repo
-    repo = Repo(repopath)
     branch_names = sorted([h.name for h in repo.heads], reverse=True)
 
     # delete all branches starting with "PR_"
@@ -82,24 +83,20 @@ def create_local_branch_foreach_pr(repopath, ids_prs):
 
 
 # ************************************************************************************************
-def create_local_remote_foreach_pr_user(repopath, prs_users_data):
-
-    # local repo, create non existing remotes, fetch all remotes
-    from git import Repo
-    local_repo = Repo(repopath)
+def create_local_remote_foreach_pr_user(repo, prs_users_data):
 
     remote_names = []
-    for remote in local_repo.remotes:
+    for remote in repo.remotes:
         remote_names.append(remote.name)
 
     remote_names
 
     for userlogin, repoaddress in prs_users_data.items():
         if userlogin not in remote_names:
-            aremote = local_repo.create_remote(userlogin, repoaddress)
-        local_repo.git.fetch(userlogin)
+            aremote = repo.create_remote(userlogin, repoaddress)
+        repo.git.fetch(userlogin)
 
-    for r in local_repo.remotes:
+    for r in repo.remotes:
         if r.name not in prs_users_data:
             print(r)
 
@@ -107,28 +104,16 @@ def create_local_remote_foreach_pr_user(repopath, prs_users_data):
 
 
 # ************************************************************************************************
-def push_to_local_repo(repopath):
-    # git push -f origin --all
-    
-    # TODO: even better error handling
-    if repopath is None:
-        print("No repopath given, nothing done.")
-        return
+def push_to_local_repo(repo):
 
-    from git import Repo
-    repo = Repo(repopath)
+    # git push -f origin --all
     repo.git.push("-f", "origin", "--all")
 
 
 # ************************************************************************************************
-def get_gitlab_prs_pipelinedata(token, projectname_on_gitlab):
+def get_gitlab_prs_pipelinedata(gitlab_project, projectname_on_gitlab):
 
-    from gitlab import Gitlab
-    gl = Gitlab("https://gitlab.com/", private_token="")
-    project = gl.projects.get(projectname_on_gitlab)
-    project.name
-
-    pipelines = project.pipelines.list(all=True)
+    pipelines = gitlab_project.pipelines.list(all=True)
     print(len(pipelines))
 
     prs_pipelinedata = {}
@@ -150,14 +135,10 @@ def get_gitlab_prs_pipelinedata(token, projectname_on_gitlab):
 base_comment_pr_pipeline = """<a href="https://gitlab.com/berndhahnebach/FreeCAD/-/commits/branchname"><img alt="pipeline status" src="https://gitlab.com/berndhahnebach/FreeCAD/badges/branchname/pipeline.svg" /></a> for feature branch [branchname](https://gitlab.com/berndhahnebach/FreeCAD/-/commits/branchname). Pipeline [#pipelineid ](https://gitlab.com/berndhahnebach/FreeCAD/-/pipelines/pipelineid) was triggered at [shortidcommit](https://github.com/FreeCAD/FreeCAD/pull/pullid/commits/commitid). All CI branch [pipelines](https://gitlab.com/berndhahnebach/FreeCAD/-/pipelines?scope=branches)."""
 
 
-def generate_comment_foreach_pr_pipeline(token, prs_pipelinedata):
+def generate_comment_foreach_pr_pipeline(github_repo, prs_pipelinedata):
 
-    from github import Github
-    g = Github(token)
-    repo = g.get_user("FreeCAD").get_repo("FreeCAD")
-    repo.name
+    prs_open = github_repo.get_pulls("open")
 
-    prs_open = repo.get_pulls("open")
     comments_all = []
     comments_new = {}
     for pr in prs_open:
@@ -189,14 +170,10 @@ def generate_comment_foreach_pr_pipeline(token, prs_pipelinedata):
 
 
 # ************************************************************************************************
-def create_on_github_comment_foreach_pr_pipeline(token, comments_new):
+def create_on_github_comment_foreach_pr_pipeline(github_repo, comments_new):
 
-    from github import Github
-    g = Github(token)
-    repo = g.get_user("FreeCAD").get_repo("FreeCAD")
-    repo.name
+    prs_open = github_repo.get_pulls("open")
 
-    prs_open = repo.get_pulls("open")
     for pr in prs_open:
         if pr.number in comments_new:
             the_comment = comments_new[pr.number]
@@ -204,13 +181,9 @@ def create_on_github_comment_foreach_pr_pipeline(token, comments_new):
 
 
 # ************************************************************************************************
-def get_github_prs_do_not_contain_text_in_all_comments(token, search_text):
+def get_github_prs_do_not_contain_text_in_all_comments(github_repo, search_text):
 
-    from github import Github
-    g = Github(token)
-    repogh = g.get_user("FreeCAD").get_repo("FreeCAD")
-    repogh.name
-    prs_open = repogh.get_pulls("open")
+    prs_open = github_repo.get_pulls("open")
 
     pr_notextincomments = []
     for pro in prs_open:
@@ -225,15 +198,10 @@ def get_github_prs_do_not_contain_text_in_all_comments(token, search_text):
 
 
 # ************************************************************************************************
-def get_gitlab_branches_without_pipline(token, projectname_on_gitlab):
+def get_gitlab_branches_without_pipline(gitlab_project, projectname_on_gitlab):
 
-    from gitlab import Gitlab
-    gl = Gitlab("https://gitlab.com/", private_token=token)
-    project = gl.projects.get(projectname_on_gitlab)
-    project.name
+    pipelines = gitlab_project.pipelines.list(all=True)
 
-    pipelines = project.pipelines.list(all=True)
-    # len(pipelines)
     pipeline_branches = []
     for pl in pipelines:
         if not pl.ref.startswith("PR_"):
@@ -262,13 +230,9 @@ def get_gitlab_branches_without_pipline(token, projectname_on_gitlab):
 
 
 # ************************************************************************************************
-def get_github_head_for_pr_branches(token, pr_branches):
+def get_github_head_for_pr_branches(github_repo, pr_branches):
 
-    from github import Github
-    g = Github(token)
-    repo = g.get_user("FreeCAD").get_repo("FreeCAD")
-    repo.name
-    prs_open = repo.get_pulls("open")
+    prs_open = github_repo.get_pulls("open")
 
     prs_found = []
     for pro in prs_open:
@@ -284,14 +248,12 @@ def get_github_head_for_pr_branches(token, pr_branches):
 
 
 # ************************************************************************************************
-def has_local_prbranch_a_specific_commit(repopath, prs_base,the_commit):
+def has_local_prbranch_a_specific_commit(repo, prs_base,the_commit):
     
     # the unit test commit
     # https://gitpython.readthedocs.io/en/stable/tutorial.html#the-commit-object
     # unit test commit 70c5505a75ad545cb671eb73f29d5e1626aebf78
 
-    from git import Repo
-    repo = Repo(repopath)
     co_max_timestamp = repo.commit(the_commit).committed_date
 
     cicommit_ok = []
@@ -309,13 +271,9 @@ def has_local_prbranch_a_specific_commit(repopath, prs_base,the_commit):
 
 
 # ************************************************************************************************
-def print_prlinks_according_user_and_pr(token, prslist):
+def print_prlinks_according_user_and_pr(github_repo, prslist):
 
-    from github import Github
-    g = Github(token)
-    repo = g.get_user("FreeCAD").get_repo("FreeCAD")
-    repo.name
-    prs_open = repo.get_pulls("open")
+    prs_open = github_repo.get_pulls("open")
 
     prs_noreb_user = {}
     for pro in prs_open:
