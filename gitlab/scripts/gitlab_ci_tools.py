@@ -144,7 +144,7 @@ def generate_comment_foreach_pr_pipeline(github_repo, prs_pipelinedata, gitlab_f
     for pr in prs_open:
         # print(pr.number)
         if pr.number in prs_pipelinedata:
-            branchname = gitlab_freecadci_project
+            projektname = gitlab_freecadci_project
             branchname = prs_pipelinedata[pr.number][0]
             pipelineid = str(prs_pipelinedata[pr.number][1])
             # statusvalue = prs_pipelinedata[pr.number][2]
@@ -152,8 +152,9 @@ def generate_comment_foreach_pr_pipeline(github_repo, prs_pipelinedata, gitlab_f
             pullid = str(pr.number)
             shortidcommit = prs_pipelinedata[pr.number][3][0:7]  # commitid should not in here
 
-            the_comment = base_comment_pr_pipeline.replace("projektname", projektname)
-            the_comment = base_comment_pr_pipeline.replace("branchname", branchname)
+            the_comment = base_comment_pr_pipeline
+            the_comment = the_comment.replace("projektname", projektname)
+            the_comment = the_comment.replace("branchname", branchname)
             the_comment = the_comment.replace("pipelineid", pipelineid)
             # the_comment = the_comment.replace("statusvalue", statusvalue)
             the_comment = the_comment.replace("commitid", commitid)
