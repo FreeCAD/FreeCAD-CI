@@ -54,7 +54,8 @@ prs_pipelinedata = glci.get_gitlab_prs_pipelinedata(
 )
 comments_all, comments_new = glci.generate_comment_foreach_pr_pipeline(
     github_repo,
-    prs_pipelinedata
+    prs_pipelinedata,
+    gitlab_freecadci_project
 )
 #for c in comments_all:
 #    print("\n\n{}".format(c))

@@ -132,10 +132,10 @@ def get_gitlab_prs_pipelinedata(gitlab_project, projectname_on_gitlab):
 
 
 # ************************************************************************************************
-base_comment_pr_pipeline = """<a href="https://gitlab.com/berndhahnebach/FreeCAD/-/commits/branchname"><img alt="pipeline status" src="https://gitlab.com/berndhahnebach/FreeCAD/badges/branchname/pipeline.svg" /></a> for feature branch [branchname](https://gitlab.com/berndhahnebach/FreeCAD/-/commits/branchname). Pipeline [#pipelineid ](https://gitlab.com/berndhahnebach/FreeCAD/-/pipelines/pipelineid) was triggered at [shortidcommit](https://github.com/FreeCAD/FreeCAD/pull/pullid/commits/commitid). All CI branch [pipelines](https://gitlab.com/berndhahnebach/FreeCAD/-/pipelines?scope=branches)."""
+base_comment_pr_pipeline = """<a href="https://gitlab.com/projektname/-/commits/branchname"><img alt="pipeline status" src="https://gitlab.com/projektname/badges/branchname/pipeline.svg" /></a> for feature branch [branchname](https://gitlab.com/projektname/-/commits/branchname). Pipeline [#pipelineid ](https://gitlab.com/projektname/-/pipelines/pipelineid) was triggered at [shortidcommit](https://github.com/FreeCAD/FreeCAD/pull/pullid/commits/commitid). All CI branch [pipelines](https://gitlab.com/projektname/-/pipelines?scope=branches)."""
 
 
-def generate_comment_foreach_pr_pipeline(github_repo, prs_pipelinedata):
+def generate_comment_foreach_pr_pipeline(github_repo, prs_pipelinedata, gitlab_freecadci_project):
 
     prs_open = github_repo.get_pulls("open")
 
@@ -144,6 +144,7 @@ def generate_comment_foreach_pr_pipeline(github_repo, prs_pipelinedata):
     for pr in prs_open:
         # print(pr.number)
         if pr.number in prs_pipelinedata:
+            branchname = gitlab_freecadci_project
             branchname = prs_pipelinedata[pr.number][0]
             pipelineid = str(prs_pipelinedata[pr.number][1])
             # statusvalue = prs_pipelinedata[pr.number][2]
@@ -151,6 +152,7 @@ def generate_comment_foreach_pr_pipeline(github_repo, prs_pipelinedata):
             pullid = str(pr.number)
             shortidcommit = prs_pipelinedata[pr.number][3][0:7]  # commitid should not in here
 
+            the_comment = base_comment_pr_pipeline.replace("projektname", projektname)
             the_comment = base_comment_pr_pipeline.replace("branchname", branchname)
             the_comment = the_comment.replace("pipelineid", pipelineid)
             # the_comment = the_comment.replace("statusvalue", statusvalue)
