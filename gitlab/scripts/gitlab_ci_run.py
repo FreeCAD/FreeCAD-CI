@@ -3,7 +3,6 @@ import gitlab_ci_tools as glci
 import importlib
 importlib.reload(glci)
 
-
 # repo data
 from personal_data import github_token
 from personal_data import gitlab_token
@@ -19,18 +18,23 @@ local_ci_repo = glci.get_local_ci_repo(local_freecadci_repopath)
 # ************************************************************************************************
 # the CI tools
 # ************************************************************************************************
-# get open PRs and create a local branch for each PR, delete all local PR branches before
+
+
+# ************************************************************************************************
+# get open PR numberns
 ids_prs = glci.get_github_open_pr_numbers(
     github_repo
 )
+# delete all local PR branches, create a local branch for each PR
 status = glci.create_local_branch_foreach_pr(
     local_ci_repo,
     ids_prs
 )
-# get github pr users data, create a remote if not exists and fetch remote
+# get github pr users data
 prs_users_data = glci.get_github_open_pr_users_data(
     github_repo
-)    
+)
+# create a remote if not exists and fetch remote
 status = glci.create_local_remote_foreach_pr_user(
     local_ci_repo,
     prs_users_data
@@ -57,8 +61,8 @@ comments_all, comments_new = glci.generate_comment_foreach_pr_pipeline(
     prs_pipelinedata,
     gitlab_freecadci_project
 )
-#for c in comments_all:
-#    print("\n\n{}".format(c))
+# for c in comments_all:
+#     print("\n\n{}".format(c))
 # printing the new comments before actually make them
 len(comments_new)
 for k, v in comments_new.items():
@@ -73,6 +77,9 @@ for k, v in comments_new.items():
 # ************************************************************************************************
 # more helpers
 # ************************************************************************************************
+
+
+# ************************************************************************************************
 # find which PRs does not have a special comment, just search for text ...
 pr_notextincomments = glci.get_github_prs_do_not_contain_text_in_all_comments(
     github_repo,
@@ -82,11 +89,10 @@ pr_notextincomments
 
 
 # ************************************************************************************************
-# get the branches without pipeline and check if the have the CI unit test commit
+# get the branches without pipeline and check if they have the CI unit test commit
 # gitlab get branches without a pipeline
 brs_no_pipeline = glci.get_gitlab_branches_without_pipline(
-    gitlab_project,
-    gitlab_freecadci_project    
+    gitlab_project
 )
 # github ...
 prs_base = glci.get_github_head_for_pr_branches(

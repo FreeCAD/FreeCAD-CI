@@ -20,7 +20,7 @@ def get_gitlab_project(token, prj_namespace):
 
 # ************************************************************************************************
 def get_local_ci_repo(repopath):
-    
+
     from git import Repo
     repo = Repo(repopath)
 
@@ -32,18 +32,18 @@ def get_github_open_pr_numbers(github_repo):
 
     prs_open = github_repo.get_pulls("open")
 
-    ids_prs = []
+    ids = []
     for pr in prs_open:
         # print(pr.number)
-        ids_prs.append(pr.number)
+        ids.append(pr.number)
 
-    print(len(ids_prs))
-    return ids_prs
+    print("Open PRs on github project '{}': {}".format(github_repo.full_name, len(ids)))
+    return ids
 
 
 # ************************************************************************************************
 def get_github_open_pr_users_data(github_repo):
-    
+
     prs_open = github_repo.get_pulls("open")
 
     prs_users_data = {}
@@ -63,7 +63,7 @@ def get_github_open_pr_users_data(github_repo):
 # ************************************************************************************************
 def create_local_branch_foreach_pr(repo, ids_prs):
 
-    branch_names = sorted([h.name for h in repo.heads], reverse=True)
+    # branch_names = sorted([h.name for h in repo.heads], reverse=True)
 
     # delete all branches starting with "PR_"
     for br in repo.heads:
@@ -76,7 +76,7 @@ def create_local_branch_foreach_pr(repo, ids_prs):
         fetch_string = "pull/{}/head:PR_{}".format(pr_no, pr_no)
         try:
             repo.git.fetch("freecad", fetch_string)
-        except:
+        except Exception:
             print("Failed: {}".format(pr_no))
 
     return True
@@ -93,7 +93,7 @@ def create_local_remote_foreach_pr_user(repo, prs_users_data):
 
     for userlogin, repoaddress in prs_users_data.items():
         if userlogin not in remote_names:
-            aremote = repo.create_remote(userlogin, repoaddress)
+            repo.create_remote(userlogin, repoaddress)
         repo.git.fetch(userlogin)
 
     for r in repo.remotes:
@@ -201,7 +201,24 @@ def get_github_prs_do_not_contain_text_in_all_comments(github_repo, search_text)
 
 
 # ************************************************************************************************
-def get_gitlab_branches_without_pipline(gitlab_project, projectname_on_gitlab):
+def get_gitlab_prbranches_names(gitlab_project):
+
+    branches = gitlab_project.branches.list(all=True)
+
+    branch_names = []
+    for br in branches:
+        if not br.name.startswith("PR_"):
+            continue
+        branch_names.append(br.name)
+
+    branch_names = sorted(branch_names)
+    # len(branch_names)
+
+    return branch_names
+
+
+# ************************************************************************************************
+def get_gitlab_branches_without_pipline(gitlab_project):
 
     pipelines = gitlab_project.pipelines.list(all=True)
 
@@ -214,18 +231,10 @@ def get_gitlab_branches_without_pipline(gitlab_project, projectname_on_gitlab):
     pipeline_branches = sorted(list(set(pipeline_branches)))
     # len(pipeline_branches)
 
-    branches = project.branches.list(all=True)
-    branch_names = []
-    for br in branches:
-        if not br.name.startswith("PR_"):
-            continue
-        branch_names.append(br.name)
-
-    branch_names = sorted(branch_names)
-    # len(branch_names)
+    prbranches_names = get_gitlab_prbranches_names(gitlab_project)
 
     brs_no_pipeline = []
-    for brn in branch_names:
+    for brn in prbranches_names:
         if brn not in pipeline_branches:
             brs_no_pipeline.append(brn)
 
@@ -251,8 +260,8 @@ def get_github_head_for_pr_branches(github_repo, pr_branches):
 
 
 # ************************************************************************************************
-def has_local_prbranch_a_specific_commit(repo, prs_base,the_commit):
-    
+def has_local_prbranch_a_specific_commit(repo, prs_base, the_commit):
+
     # the unit test commit
     # https://gitpython.readthedocs.io/en/stable/tutorial.html#the-commit-object
     # unit test commit 70c5505a75ad545cb671eb73f29d5e1626aebf78
