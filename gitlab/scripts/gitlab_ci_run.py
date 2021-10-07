@@ -41,7 +41,7 @@ status = glci.create_local_remote_foreach_pr_user(
 # if pushed from bash some information it printed about what was updated
 # TODO should be possible with gitpython too
 # TODO how to push without putting in login or password
-# glci.push_to_local_ci_repo(local_ci_repo)
+# glci.push_from_local_repo_to_gitlab_ci_repo(local_ci_repo)
 # git push -f origin --all
 
 
@@ -104,18 +104,15 @@ len(cicommit_notok)
 cicommit_ok  # no pipeline but commit exists --> activate pipeline
 
 
-# TODO do no use curl or https but gitlab python to activate a pipeline
 """
-https://gitlab.com/api/v4/projects/29769711/ref/REF_NAME/trigger/pipeline?token=TOKEN
-https://gitlab.com/api/v4/projects/29769711/ref/PR_5050/trigger/pipeline?token=the_gitlab_token
-
-# oder
-
-curl -X POST \
-     -F token=the_gitlab_token \
-     -F ref=PR_4975 \
-     https://gitlab.com/api/v4/projects/29769711/trigger/pipeline
-
+# Create a new pipeline for a branch
+- CI/CD --> Editor
+- choose the branch
+- commit changes
+- the pipeline is triggered
+- make a force push to overwrite the commit
+- a new pipeline is triggered
+- the one before can be deleted
 """
 
 

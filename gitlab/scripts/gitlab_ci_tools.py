@@ -104,7 +104,7 @@ def create_local_remote_foreach_pr_user(repo, prs_users_data):
 
 
 # ************************************************************************************************
-def push_to_local_repo(repo):
+def push_from_local_repo_to_gitlab_ci_repo(repo):
 
     # git push -f origin --all
     repo.git.push("-f", "origin", "--all")
