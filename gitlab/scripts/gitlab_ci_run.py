@@ -1,19 +1,20 @@
 # imports
 import gitlab_ci_tools as glci
 import importlib
-importlib.reload(glci)
 
 # repo data
 from personal_data import github_token
 from personal_data import gitlab_token
 from personal_data import local_freecadci_repopath
-from personal_data import gitlab_freecadci_project
+from personal_data import gitlab_freecadci_prj
 from personal_data import github_user
 from personal_data import github_prjname
 github_repo = glci.get_github_repo(github_token, github_user, github_prjname)
-gitlab_project = glci.get_gitlab_project(gitlab_token, gitlab_freecadci_project)
+gitlab_project = glci.get_gitlab_project(gitlab_token, gitlab_freecadci_prj)
 local_ci_repo = glci.get_local_ci_repo(local_freecadci_repopath)
 
+# reloads after imports because of pep8
+importlib.reload(glci)
 
 # ************************************************************************************************
 # the CI tools
@@ -54,12 +55,12 @@ status = glci.create_local_remote_foreach_pr_user(
 # generate comment if a pipline of any updated or added PR has finished
 prs_pipelinedata = glci.get_gitlab_prs_pipelinedata(
     gitlab_project,
-    gitlab_freecadci_project
+    gitlab_freecadci_prj
 )
 comments_all, comments_new = glci.generate_comment_foreach_pr_pipeline(
     github_repo,
     prs_pipelinedata,
-    gitlab_freecadci_project
+    gitlab_freecadci_prj
 )
 # for c in comments_all:
 #     print("\n\n{}".format(c))
@@ -89,7 +90,8 @@ pr_notextincomments
 
 
 # ************************************************************************************************
-# get the branches without pipeline and check if they have the CI unit test commit
+# get the branches without a pipeline
+# check if they have the CI unit test commit
 # gitlab get branches without a pipeline
 brs_no_pipeline = glci.get_gitlab_branches_without_pipline(
     gitlab_project
@@ -127,3 +129,21 @@ result = glci.print_prlinks_according_user_and_pr(
     github_repo,
     cicommit_notok
 )
+
+
+# ************************************************************************************************
+# get branches without open PRs
+prs_ids = sorted(glci.get_github_open_pr_numbers(github_repo))
+prbranches_names = sorted(glci.get_gitlab_prbranches_names(gitlab_project))
+
+branches_without_open_pr = []
+for prbr in prbranches_names:
+    if int(prbr.lstrip("PR_")) not in prs_ids:
+        branches_without_open_pr.append(prbr)
+
+len(prs_ids)
+len(prbranches_names)
+prs_ids
+prbranches_names
+
+branches_without_open_pr

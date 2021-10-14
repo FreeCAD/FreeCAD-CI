@@ -37,7 +37,10 @@ def get_github_open_pr_numbers(github_repo):
         # print(pr.number)
         ids.append(pr.number)
 
-    print("Open PRs on github project '{}': {}".format(github_repo.full_name, len(ids)))
+    print(
+        "Open PRs on github project '{}': {}"
+        .format(github_repo.full_name, len(ids))
+    )
     return ids
 
 
@@ -135,7 +138,11 @@ def get_gitlab_prs_pipelinedata(gitlab_project, projectname_on_gitlab):
 base_comment_pr_pipeline = """<a href="https://gitlab.com/projektname/-/commits/branchname"><img alt="pipeline status" src="https://gitlab.com/projektname/badges/branchname/pipeline.svg" /></a> for feature branch [branchname](https://gitlab.com/projektname/-/commits/branchname). Pipeline [#pipelineid ](https://gitlab.com/projektname/-/pipelines/pipelineid) was triggered at [shortidcommit](https://github.com/FreeCAD/FreeCAD/pull/pullid/commits/commitid). All CI branch [pipelines](https://gitlab.com/projektname/-/pipelines?scope=branches)."""
 
 
-def generate_comment_foreach_pr_pipeline(github_repo, prs_pipelinedata, gitlab_freecadci_project):
+def generate_comment_foreach_pr_pipeline(
+    github_repo,
+    prs_pipelinedata,
+    gitlab_freecadci_project
+):
 
     prs_open = github_repo.get_pulls("open")
 
@@ -150,7 +157,8 @@ def generate_comment_foreach_pr_pipeline(github_repo, prs_pipelinedata, gitlab_f
             # statusvalue = prs_pipelinedata[pr.number][2]
             commitid = prs_pipelinedata[pr.number][3]
             pullid = str(pr.number)
-            shortidcommit = prs_pipelinedata[pr.number][3][0:7]  # commitid should not in here
+            # the word commitid should not in there in next line, is ok :-)
+            shortidcommit = prs_pipelinedata[pr.number][3][0:7]
 
             the_comment = base_comment_pr_pipeline
             the_comment = the_comment.replace("projektname", projektname)
@@ -184,7 +192,10 @@ def create_on_github_comment_foreach_pr_pipeline(github_repo, comments_new):
 
 
 # ************************************************************************************************
-def get_github_prs_do_not_contain_text_in_all_comments(github_repo, search_text):
+def get_github_prs_do_not_contain_text_in_all_comments(
+    github_repo,
+    search_text
+):
 
     prs_open = github_repo.get_pulls("open")
 
