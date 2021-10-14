@@ -12,6 +12,9 @@ from personal_data import github_prjname
 github_repo = glci.get_github_repo(github_token, github_user, github_prjname)
 gitlab_project = glci.get_gitlab_project(gitlab_token, gitlab_freecadci_prj)
 local_ci_repo = glci.get_local_ci_repo(local_freecadci_repopath)
+# for local_ci_repo make sure:
+# local_ci_repo has remote freecad from FreeCAD github
+# no master branch but a branch named main instead
 
 
 # reloads after imports because of pep8
