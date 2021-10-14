@@ -135,9 +135,22 @@ def get_gitlab_prs_pipelinedata(gitlab_project, projectname_on_gitlab):
 
 
 # ************************************************************************************************
-base_comment_pr_pipeline = """<a href="https://gitlab.com/projektname/-/commits/branchname"><img alt="pipeline status" src="https://gitlab.com/projektname/badges/branchname/pipeline.svg" /></a> for feature branch [branchname](https://gitlab.com/projektname/-/commits/branchname). Pipeline [#pipelineid ](https://gitlab.com/projektname/-/pipelines/pipelineid) was triggered at [shortidcommit](https://github.com/FreeCAD/FreeCAD/pull/pullid/commits/commitid). All CI branch [pipelines](https://gitlab.com/projektname/-/pipelines?scope=branches)."""
-
-
+base_comment_pr_pipeline = (
+    '<a '
+    'href="https://gitlab.com/projektname/-/commits/branchname"'
+    '><img alt="pipeline status" src="'
+    'https://gitlab.com/projektname/badges/branchname/pipeline.svg'
+    '"/></a>'
+    'for feature branch [branchname]('
+    'https://gitlab.com/projektname/-/commits/branchname'
+    '). Pipeline [#pipelineid ]('
+    'https://gitlab.com/projektname/-/pipelines/pipelineid'
+    ') was triggered at [shortidcommit]('
+    'https://github.com/FreeCAD/FreeCAD/pull/pullid/commits/commitid'
+    '). All CI branch [pipelines]('
+    'https://gitlab.com/projektname/-/pipelines?scope=branches'
+    ').'
+)
 def generate_comment_foreach_pr_pipeline(
     github_repo,
     prs_pipelinedata,
