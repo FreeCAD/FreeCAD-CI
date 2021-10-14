@@ -6,15 +6,17 @@ import importlib
 from personal_data import github_token
 from personal_data import gitlab_token
 from personal_data import local_freecadci_repopath
-from personal_data import gitlab_freecadci_project
+from personal_data import gitlab_freecadci_project as gitlab_freecadci_prj
 from personal_data import github_user
 from personal_data import github_prjname
 github_repo = glci.get_github_repo(github_token, github_user, github_prjname)
 gitlab_project = glci.get_gitlab_project(gitlab_token, gitlab_freecadci_prj)
 local_ci_repo = glci.get_local_ci_repo(local_freecadci_repopath)
 
+
 # reloads after imports because of pep8
 importlib.reload(glci)
+
 
 # ************************************************************************************************
 # the CI tools
