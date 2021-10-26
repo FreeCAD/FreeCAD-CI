@@ -207,6 +207,25 @@ def create_on_github_comment_foreach_pr_pipeline(github_repo, comments_new):
 
 
 # ************************************************************************************************
+def get_github_prs_contain_text_in_a_comment(
+    github_repo,
+    search_text
+):
+
+    prs_open = github_repo.get_pulls("open")
+
+    pr_textinacomment = []
+    for pro in prs_open:
+        # print(pro.number)
+        for comment in pro.get_issue_comments():
+            if search_text in comment.body:
+                pr_textinacomment.append(pro.number)
+                break
+
+    return pr_textinacomment
+
+
+# ************************************************************************************************
 def get_github_prs_do_not_contain_text_in_all_comments(
     github_repo,
     search_text

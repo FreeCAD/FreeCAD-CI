@@ -86,7 +86,16 @@ for k, v in comments_new.items():
 
 
 # ************************************************************************************************
-# find which PRs does not have a special comment, just search for text ...
+# find which PRs have some text in at least one comment, just search for text ...
+pr_textinacomment = glci.get_github_prs_contain_text_in_a_comment(
+    github_repo,
+    "gitlab.com/berndhahnebach"
+)
+pr_textinacomment
+
+
+# ************************************************************************************************
+# find which PRs does not have some special text, just search for text ...
 pr_notextincomments = glci.get_github_prs_do_not_contain_text_in_all_comments(
     github_repo,
     "The CI-status is available on the latest commit of the branch."
