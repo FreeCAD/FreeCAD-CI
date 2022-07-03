@@ -13,7 +13,7 @@ def get_github_repo(token, github_user, github_prjname):
     # print(repo.name)
     return repo
 
-	
+
 # ************************************************************************************************
 def get_gitlab_project(token, prj_namespace):
 
@@ -139,7 +139,7 @@ def push_from_local_repo_to_gitlab_ci_repo(repo):
     try:
         repo.git.push("-f", "origin", "--all")
     except Exception:
-    	print("Problem on push lokal repo to gitlab")
+        print("Problem on push lokal repo to gitlab")
 
 
 # ************************************************************************************************
@@ -148,8 +148,8 @@ def get_gitlab_prs_pipelinedata(gitlab_project, projectname_on_gitlab):
     try:
         pipelines = gitlab_project.pipelines.list(all=True)
     except Exception:
-        print("Problems in getting the pipeline data from gitlab") 
-        pipelines = [] 
+        print("Problems in getting the pipeline data from gitlab")
+        pipelines = []
 
     print(len(pipelines))
 

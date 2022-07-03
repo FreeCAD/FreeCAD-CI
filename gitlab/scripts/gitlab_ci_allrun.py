@@ -66,6 +66,6 @@ def run_all():
     glci.create_on_github_comment_foreach_pr_pipeline(github_repo, comments_new)
 
     # push
-    # push with bernd and not with freecadci thus not yet ok 
+    # push with bernd and not with freecadci thus not yet ok
     print("puuuush")
     glci.push_from_local_repo_to_gitlab_ci_repo(local_ci_repo)
