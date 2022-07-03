@@ -2,7 +2,10 @@ def run_forever():
     import time
     while True:
         print("Run started")
-        run_all()
+        try:
+            run_all()
+        except Exception:
+            print("run_all() failed")
         print("Run finished")
         print("Pause time start")
         print("60")
@@ -18,9 +21,6 @@ def run_forever():
         print("10")
         time.sleep(10)
         print("Pause time end")
-        run_all()
-        print("Pause looong")
-        time.sleep(1000)
     
 
 def run_all():
@@ -28,7 +28,6 @@ def run_all():
     import gitlab_ci_tools as glci
     import importlib
     importlib.reload(glci)
-
 
     # repo data
     from personal_data import github_token
@@ -40,7 +39,6 @@ def run_all():
     github_repo = glci.get_github_repo(github_token, github_user, github_prjname)
     gitlab_project = glci.get_gitlab_project(gitlab_token, gitlab_freecadci_project)
     local_ci_repo = glci.get_local_ci_repo(local_freecadci_repopath)
-
 
     # ************************************************************************************************
     # see gitlab_ci_run module
@@ -66,3 +64,8 @@ def run_all():
         print("\n# {} {}". format(k, 50*"*"))
         print(v)
     glci.create_on_github_comment_foreach_pr_pipeline(github_repo, comments_new)
+
+    # push
+    # push with bernd and not with freecadci thus not yet ok 
+    print("puuuush")
+    glci.push_from_local_repo_to_gitlab_ci_repo(local_ci_repo)

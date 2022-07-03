@@ -3,11 +3,17 @@ def get_github_repo(token, github_user, github_prjname):
 
     from github import Github
     gh = Github(token)
-    repo = gh.get_user(github_user).get_repo(github_prjname)
+    repo = None
+    while repo is None:
+        try:
+            repo = gh.get_user(github_user).get_repo(github_prjname)
+        except Exception:
+            print("Problem in retrieving the github repo")
+            repo = None
     # print(repo.name)
     return repo
 
-
+	
 # ************************************************************************************************
 def get_gitlab_project(token, prj_namespace):
 
@@ -67,20 +73,37 @@ def get_github_open_pr_users_data(github_repo):
 def create_local_branch_foreach_pr(repo, ids_prs):
 
     # branch_names = sorted([h.name for h in repo.heads], reverse=True)
+    # print(branch_names)
 
     # delete all branches starting with "PR_"
     for br in repo.heads:
         if br.name.startswith("PR_"):
             repo.git.branch("-D", br.name)
+    # branch_names = sorted([h.name for h in repo.heads], reverse=True)
+    # print(branch_names)
+
+    # try to fetch freecad
+    github_fc_remote = "freecad"
+    try:
+        out = repo.git.fetch(github_fc_remote)
+        print("Try to fetch remote FreeCAD repo from github")
+        print(out)
+    except Exception:
+        print(
+        "Fetching reomte 'freecad' failed for local repo"
+        "try 'git fetch freecad on local git repo, if it fails add"
+        "'ceck if 'git remote add freecad https://github.com/FreeCAD/FreeCAD'"
+    )
+    return False
 
     # checkout a branch for each PR
     for pr_no in ids_prs:
         print(pr_no)
         fetch_string = "pull/{}/head:PR_{}".format(pr_no, pr_no)
         try:
-            repo.git.fetch("freecad", fetch_string)
+            repo.git.fetch(github_fc_remote, fetch_string)
         except Exception:
-            print("Failed: {}".format(pr_no))
+            print("Failed to checkout on local FreeCAD_CI repo: {}".format(pr_no))
 
     return True
 
@@ -97,7 +120,10 @@ def create_local_remote_foreach_pr_user(repo, prs_users_data):
     for userlogin, repoaddress in prs_users_data.items():
         if userlogin not in remote_names:
             repo.create_remote(userlogin, repoaddress)
-        repo.git.fetch(userlogin)
+        try:
+            repo.git.fetch(userlogin)
+        except Exception:
+            print("Could not fetch {}".format(userlogin))
 
     for r in repo.remotes:
         if r.name not in prs_users_data:
@@ -110,13 +136,21 @@ def create_local_remote_foreach_pr_user(repo, prs_users_data):
 def push_from_local_repo_to_gitlab_ci_repo(repo):
 
     # git push -f origin --all
-    repo.git.push("-f", "origin", "--all")
+    try:
+        repo.git.push("-f", "origin", "--all")
+    except Exception:
+    	print("Problem on push lokal repo to gitlab")
 
 
 # ************************************************************************************************
 def get_gitlab_prs_pipelinedata(gitlab_project, projectname_on_gitlab):
 
-    pipelines = gitlab_project.pipelines.list(all=True)
+    try:
+        pipelines = gitlab_project.pipelines.list(all=True)
+    except Exception:
+        print("Problems in getting the pipeline data from gitlab") 
+        pipelines = [] 
+
     print(len(pipelines))
 
     prs_pipelinedata = {}
