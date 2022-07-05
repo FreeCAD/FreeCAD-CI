@@ -93,8 +93,8 @@ def create_local_branch_foreach_pr(repo, ids_prs):
         "Fetching reomte 'freecad' failed for local repo"
         "try 'git fetch freecad on local git repo, if it fails add"
         "'ceck if 'git remote add freecad https://github.com/FreeCAD/FreeCAD'"
-    )
-    return False
+        )
+        return False
 
     # checkout a branch for each PR
     for pr_no in ids_prs:
