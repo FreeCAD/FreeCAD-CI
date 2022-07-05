@@ -1,3 +1,10 @@
+# TODO after a longer break a few days, there are a lot new branches
+# after a push only for 4 branches a pipeline is created
+# ATM 4 branches will be deleted manually and afterwards pusched again
+# this is repated as long as there are branches without a pipeling
+# TODO: never push more than 4 branches at once
+
+
 def run_forever():
     import time
     while True:
@@ -69,3 +76,9 @@ def run_all():
     # push with bernd and not with freecadci thus not yet ok
     print("puuuush")
     glci.push_from_local_repo_to_gitlab_ci_repo(local_ci_repo)
+
+    # ************************************************************************************************
+    # delete branches on gitlab without a PR on github
+    time.sleep(2)
+    print("Branches on gitlab without PR on github will be deleted.")
+    glci.delete_gitlab_branches_without_pr_on_github(github_repo, gitlab_project)

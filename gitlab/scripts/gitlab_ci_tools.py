@@ -382,3 +382,32 @@ def print_prlinks_according_user_and_pr(github_repo, prslist):
 
     # TODO return string
     return True
+
+
+# ************************************************************************************************
+def delete_gitlab_branches_without_pr_on_github(github_repo, gitlab_project):
+
+    # get branches without open PRs
+    prs_ids = sorted(get_github_open_pr_numbers(github_repo))
+    prbranches_names = sorted(get_gitlab_prbranches_names(gitlab_project))
+
+    branches_without_open_pr = []
+    for prbr in prbranches_names:
+        if int(prbr.lstrip("PR_")) not in prs_ids:
+            branches_without_open_pr.append(prbr)
+
+    len(prs_ids)
+    len(prbranches_names)
+    prs_ids
+    prbranches_names
+    print(branches_without_open_pr)
+
+    # delete these branches
+    for prbr in branches_without_open_pr:
+        try:
+            gitlab_project.branches.delete(prbr)
+            print("branch: {} has been deleted on gitlab FreeCAD-CI.".format(prbr))
+        except Exception:
+            print("Problem  deleting branch {} on gitlab FreeCAD-CI.".format(prbr))
+
+    return True
