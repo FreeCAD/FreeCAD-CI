@@ -31,13 +31,12 @@ def delete_branches_with_no_pr():
     len(prbranches_names)
     prs_ids
     prbranches_names
-
     print(branches_without_open_pr)
 
-
     # delete these branches
-    for prbr in prbranches_names:
+    for prbr in branches_without_open_pr:
         try:
             gitlab_project.branches.delete(prbr)
+            print("branch: {} has been deleted on gitlab FreeCAD-CI.".format(prbr))
         except Exception:
-            print("Problem on deleting branch on gitlab: {}".format(prbr))
+            print("Problem  deleting branch {} on gitlab FreeCAD-CI.".format(prbr))
