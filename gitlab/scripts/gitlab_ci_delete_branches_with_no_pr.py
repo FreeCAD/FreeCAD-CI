@@ -1,11 +1,6 @@
-import sys
-# private tokens kastanie
-sys.path.append("/home/freecadci/Documents/dev/freecad_src_ci_tools/")
-# script code kastanie
-sys.path.append("/home/freecadci/Documents/dev/freecad_src_ci_tools/freecadci/gitlab/scripts/")
 # move inside the other modules
 
-def delete_branche_with_no_pr():
+def delete_branches_with_no_pr():
     # imports
     import gitlab_ci_tools as glci
     import importlib
