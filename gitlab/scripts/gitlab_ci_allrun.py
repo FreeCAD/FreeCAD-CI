@@ -5,10 +5,15 @@
 # TODO: never push more than 4 branches at once
 
 
+# imports
+import time
+
+
 def run_forever():
-    import time
+    
     while True:
         print("Run started")
+        # run_all()  # to get a error message on a fail
         try:
             run_all()
         except Exception:
